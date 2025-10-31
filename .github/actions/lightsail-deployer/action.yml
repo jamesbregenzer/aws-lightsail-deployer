@@ -1,0 +1,34 @@
+name: "Lightsail Deployer"
+description: "Deploy to AWS Lightsail via rsync/ssh"
+inputs:
+  host: { required: true }
+  user: { required: true }
+  key:  { required: true }
+  path: { required: true }
+  source:  { required: false, default: "./" }
+  exclude: { required: false }
+  dry-run: { required: false, default: "false" }
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        HOST="${{ inputs.host }}"
+        USER="${{ inputs.user }}"
+        KEY="${{ inputs.key }}"
+        DEST="${{ inputs.path }}"
+        SRC="${{ inputs.source }}"
+        EXCLUDE_FILE="$(mktemp)"
+        if [ -n "${{ inputs.exclude }}" ]; then
+          echo "${{ inputs.exclude }}" > "$EXCLUDE_FILE"
+          EX="--exclude-from=$EXCLUDE_FILE"
+        else
+          EX=""
+        fi
+        DRY=""
+        if [ "${{ inputs.dry-run }}" = "true" ]; then
+          DRY="--dry-run"
+        fi
+        echo "→ Deploying $SRC to $USER@$HOST:$DEST"
+        rsync -az $DRY --delete -e "ssh -i $KEY -o StrictHostKeyChecking=no" $EX "$SRC" "$USER@$HOST:$DEST"
