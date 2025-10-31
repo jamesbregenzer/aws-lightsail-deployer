@@ -1,0 +1,14 @@
+name: Bug report
+description: Report a bug
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes: { label: What's wrong? }
+  - type: input
+    attributes: { label: Stack details (OS / PHP / Node, etc.) }
+  - type: textarea
+    attributes: { label: Steps to reproduce }
+  - type: textarea
+    attributes: { label: Expected behavior }
+  - type: textarea
+    attributes: { label: Logs / output }
